@@ -3,35 +3,24 @@ using System.Configuration;
 
 namespace Task1
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var p = new Program();
-            p.Run();      
+            
+            p.Run();
         }
 
-        private void Run()
+        public void Run()
         {
-            Console.WriteLine($"{ConfiguredOutputText}");
+            var text = GetConfiguredOutputText();
 
-            return;
+            Console.WriteLine($"{text}");
         }
 
-        private string ConfiguredOutputText
-        {
-            get
-            {
-                var outputText = "default";
-
-                if (!String.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["output"]))
-                {
-                    outputText = ConfigurationManager.AppSettings["output"].ToString();
-                }
-
-                return outputText;
-            }
-        }
-
+        private static string GetConfiguredOutputText() => string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["OutputText"])
+            ? "So Long, and Thanks for All the Fish"
+            : ConfigurationManager.AppSettings["OutputText"];
     }
 }
