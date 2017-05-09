@@ -58,7 +58,7 @@ namespace Task2.Services
                     return JObject.Parse(json).SelectToken("appnews.newsitems").ToObject<List<NewsItem>>();
                 }
 
-                // Don't care, cause I am lazy...
+                // Don't care, cause this is just an example and I am lazy...
                 return new List<NewsItem>();
             }
         }

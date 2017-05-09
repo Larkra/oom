@@ -16,7 +16,7 @@ namespace Task2
             WriteLine();
         }
         
-        protected static void Run()
+        private static void Run()
         {
             var games = new List<Game>
             {
@@ -66,7 +66,7 @@ namespace Task2
             }
         }
 
-        protected static Action RefreshShell = () => 
+        private static Action RefreshShell = () => 
         {
             WriteLine("\nPress ENTER to continue...");
             ReadKey();

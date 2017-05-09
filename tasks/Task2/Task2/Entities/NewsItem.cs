@@ -38,15 +38,8 @@ namespace Task2.Entities
         [JsonProperty("is_external_url")]
         public bool IsExternalUrl { get; set; }
 
-        public string Author { get; set; }
-        
-        public string Feedlabel { get; set; }
-
         [JsonProperty("date")]
         [JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime ReleaseDate { get; set; }
-
-        [JsonProperty("feed_type")]
-        public int FeedType { get; set; }
+        public DateTime ReleaseDate { get; set; }                
     }
 }
