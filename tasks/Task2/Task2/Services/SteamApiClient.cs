@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Task2.Entities;
@@ -43,11 +40,9 @@ namespace Task2.Services
         /// <summary>
         /// See https://developer.valvesoftware.com/wiki/Steam_Web_API for more info...
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<NewsItem>> GetSteamNewsAsync()
+        /// <returns>A list of newsitems</returns>
+        public async Task<IList<NewsItem>> GetSteamNewsAsync()
         {
-            var newsItems = new List<NewsItem>();
-
             using (var client = HttpClient ?? new HttpClient())
             {
                 var builder = new UriBuilder($"{_cfg.BaseAddress}")
@@ -60,17 +55,12 @@ namespace Task2.Services
                 {
                     var json = await response.Content.ReadAsStringAsync();
 
-                    newsItems = JObject.Parse(json).SelectToken("appnews.newsitems").ToObject<List<NewsItem>>();
-                }
-                else
-                {
-                    // Don't care...
-                    return newsItems;
+                    return JObject.Parse(json).SelectToken("appnews.newsitems").ToObject<List<NewsItem>>();
                 }
 
+                // Don't care, cause I am lazy...
+                return new List<NewsItem>();
             }
-
-            return newsItems;
         }
 
     }
