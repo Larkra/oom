@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Task3.Enums;
 using Task3.Extensions;
 using Task3.Interfaces;
@@ -8,7 +9,6 @@ namespace Task3.Entities
     public class VideoGame : IGame
     {
         private string _title;
-        private int _playThroughs;
 
         #region properties
         public string Title
@@ -21,13 +21,12 @@ namespace Task3.Entities
                 _title = value;
             }
         }
-        
+
         public Genre Genre { get; }
         public Platform Platform { get; }
-
-        public int PlayThroughs => _playThroughs;
+        public int PlayThroughs { get; private set; }
         #endregion
-        
+
         /// <summary>
         /// Creates a new game object
         /// </summary>
@@ -40,7 +39,16 @@ namespace Task3.Entities
             Genre = genre;
             Platform = platform;
         }
-        
+
+        [JsonConstructor]
+        private VideoGame(string title, Genre genre, Platform platform, int playThroughs)
+        {
+            Title = title;
+            Genre = genre;
+            Platform = platform;
+            PlayThroughs = playThroughs;
+        }
+
         public string GetDescription()
         {
             return $"Title: {Title}\nGenre: {Genre.GetDisplayName()}\nPlatform: {Platform}\nPlayThroughs: {PlayThroughs}";
@@ -48,7 +56,7 @@ namespace Task3.Entities
 
         public void RaisePlayThroughs()
         {
-            _playThroughs++;
+            PlayThroughs++;
         }
 
     }
