@@ -77,13 +77,14 @@ namespace Task4.Services
 
         public void UpdateGameNews(Game game)
         {
-            var newsItems = _newsService.GetNewsById(game.AppId);
+            var newsItems = _newsService.GetNewsById(game.AppId).ToList();
 
             var distinctNewsItems = newsItems.Union(game.NewsItems)
                                              .DistinctBy(n => n.NewsGuid)
-                                             .OrderByDescending(n => n.ReleaseDate);
+                                             .OrderByDescending(n => n.ReleaseDate)
+                                             .Take(3);
 
-            game.NewsItems = distinctNewsItems.Take(3);
+            game.NewsItems = distinctNewsItems;
         }
         #endregion
 

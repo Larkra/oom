@@ -43,8 +43,8 @@ namespace Task4
             _provider = RegisterServices();
             
             RunNewsUpdate();
-            RunGameInfoUpdate();
-            RunDeleteGame();
+            //RunGameInfoUpdate();
+            //RunDeleteGame();
         }
 
         private static void RunNewsUpdate()
