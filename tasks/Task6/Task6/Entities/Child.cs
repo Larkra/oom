@@ -12,7 +12,7 @@ namespace Task6.Entities
         #region properties
         public string FirstName
         {
-            get { return _firstName; }
+            get {return _firstName;}
             private set
             {
                 if (string.IsNullOrWhiteSpace(value))
@@ -41,16 +41,14 @@ namespace Task6.Entities
         /// <summary>
         /// Creates a new child object - Finally, this seems to be political correct...
         /// </summary>
-        /// <param name="firstName">The first name of the woman</param>
-        /// <param name="lastName">The last name of the woman</param>
+        /// <param name="firstName">The first name of the child</param>
+        /// <param name="lastName">The last name of the child</param>
         public Child(string firstName, string lastName)
         {
             FirstName = firstName;
             LastName = lastName;
         }
-
-        private Child() { }
-
+        
         public void Talk()
         {
             WriteLine($"{Name}: Gugu gaga ...");

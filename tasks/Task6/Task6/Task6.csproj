@@ -64,6 +64,8 @@
     <Compile Include="Entities\Woman.cs" />
     <Compile Include="Entities\Man.cs" />
     <Compile Include="Enums\Salutation.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Factories\ChildFactory.cs" />
     <Compile Include="Interfaces\IPerson.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

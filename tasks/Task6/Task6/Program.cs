@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Threading;
 using static System.Console;
 using Task6.Entities;
+using Task6.Factories;
 
 namespace Task6
 {
@@ -13,9 +10,14 @@ namespace Task6
     {
         static void Main(string[] args)
         {
-            //RunPushConversation();
-            //RunAsTimeGoesBy();
-            RunReturnObjects();
+            IntroduceMethod(nameof(RunPushConversation));
+            RunPushConversation();
+
+            IntroduceMethod(nameof(RunAsTimeGoesBy));
+            RunAsTimeGoesBy();
+
+            IntroduceMethod(nameof(RunCreateChildren));
+            RunCreateChildren();
         }
 
         #region Ping Pong Actor Model with ISubject<T1, T2>
@@ -24,16 +26,15 @@ namespace Task6
             var husband = new Man("John", "Doe");
             var wife = new Woman("Jane", "Doe");
 
-            WriteLine("Press any key to stop the conversation ...");
-            WriteLine();
-
-            var manSubscription = wife.Subscribe(husband);
-            var womanSubscription = husband.Subscribe(wife);
-
-            ReadKey();
-
-            manSubscription.Dispose();
-            womanSubscription.Dispose();
+            using (var manSubscription = wife.Subscribe(husband))
+            {
+                using (var womanSubscription = husband.Subscribe(wife))
+                {
+                    WriteLine("Press any key to stop the conversation ...");
+                    WriteLine();
+                    ReadKey();
+                }
+            }
 
             WriteLine();
             WriteLine("The conversation is over.");
@@ -44,7 +45,7 @@ namespace Task6
         #region Filter and Select - Simple
         private static void RunAsTimeGoesBy()
         {
-            WriteLine("As time goes by ... Press any key to stop aging ...");
+            WriteLine("As time goes by ...");
             WriteLine();
 
             var man = new Man("John", "Doe");
@@ -56,72 +57,45 @@ namespace Task6
             var oneYearPerSecond = Observable.Interval(TimeSpan.FromSeconds(1));
 
             var agingByInterval = oneYearPerSecond
-                                        .Where(n => n > 1)
+                                        .Where(n => n > 1 && n < 100)
                                         .Select(n => man.Age = (int)n);
 
-            agingByInterval.Subscribe(age =>
+            using (var handle = agingByInterval.Subscribe(age =>
             {
                 WriteLine("... Another year has passed ...");
                 man.PrintAge();
-            });
-
-            ReadKey();
+            }))
+            {
+                WriteLine("Press any key to stop aging ...");
+                WriteLine();
+                ReadKey();
+            }
         }
         #endregion
 
-        private static void RunReturnObjects()
+        #region Push objects with Observable Create
+        private static void RunCreateChildren()
         {
-            WriteLine("Addition to the family ... Press any key to stop it ...");
+            WriteLine("Addition to the family ...");
             WriteLine();
 
-            var childrenCount = Children.Count();
-            var producer = new Subject<Child>();
+            var childObservable = Observable.Create((Func<IObserver<Child>, IDisposable>)ChildFactory.ChildSubscribe);
 
-            var sub = producer.Subscribe(ch => ch.Talk());
-
-            for (var i = 0; i < childrenCount; i++)
+            using (var handle = childObservable.Subscribe(child => WriteLine($"{child.Name} is born ...")))
             {
-                Thread.Sleep(TimeSpan.FromSeconds(1));
-                producer.OnNext(Children[i]);
+                WriteLine("Press any key to stop ...");
+                WriteLine();
+                ReadKey();
             }
+        }
+        #endregion
 
+        private static void IntroduceMethod(string methodName)
+        {
+            WriteLine($"Press any key to run {methodName}");
             ReadKey();
-            producer.OnCompleted();
-
-            var c = NonBlocking();
-            var subscription = c.Subscribe(ch => ch.Talk());
-            
-            ReadKey();
-            subscription.Dispose();
-            sub.Dispose();
+            Clear();
         }
 
-        private static IObservable<Child> NonBlocking()
-        {
-            return Observable.Create<Child>(
-                (IObserver<Child> observer) =>
-            {
-                observer.OnNext(new Child("Lillith", "Doe"));
-                observer.OnNext(new Child("Adam", "Doe"));
-                observer.OnNext(new Child("Eva", "Doe"));
-                observer.OnCompleted();
-                Thread.Sleep(3000);
-                return Disposable.Create(() => WriteLine("Observer has unsubcribed"));
-            });
-        }
-
-        private static Child[] Children => new[]
-        {
-            new Child("Adam", "Doe"),
-            new Child("Eva", "Doe"),
-            new Child("Lillith", "Doe"),
-            new Child("Rincewind", "Doe"),
-            new Child("Cohen", "Doe"),
-            new Child("John", "Skeet"),
-            new Child("Jack", "Doe"),
-            new Child("Sebastian", "Doe"),
-            new Child("Sarah", "Doe"),
-            new Child("Serenity", "Doe")
-        };
     }
 }
