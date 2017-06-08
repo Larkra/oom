@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading;
 using static System.Console;
 using Task6.Entities;
 using Task6.Factories;
@@ -18,6 +21,9 @@ namespace Task6
 
             IntroduceMethod(nameof(RunCreateChildren));
             RunCreateChildren();
+
+            IntroduceMethod(nameof(RunPushSubjects));
+            RunPushSubjects();
         }
 
         #region Ping Pong Actor Model with ISubject<T1, T2>
@@ -89,6 +95,40 @@ namespace Task6
             }
         }
         #endregion
+
+        #region Push objects with Subject<T>
+        private static void RunPushSubjects()
+        {
+            var devs = new ReplaySubject<KeyValuePair<Child, string>>();
+            foreach (var subjectMock in SubjectMocks)
+            {
+                devs.OnNext(subjectMock);
+            }
+            
+            using (var handle = devs.Delay(TimeSpan.FromSeconds(2)).Subscribe(c =>
+            {
+                WriteLine($"{c.Key.Name}: Who loves {c.Value}?");
+                Thread.Sleep(2000);
+                WriteLine("Me: I do!!!");
+                Thread.Sleep(2000);
+                WriteLine();
+            }))
+            {
+                WriteLine("Press any key to stop ...");
+                WriteLine();
+                ReadKey();
+            }
+        }
+        #endregion
+        
+        private static IDictionary<Child, string> SubjectMocks => new Dictionary<Child, string>
+        {
+            { new Child("Ron"    , "Gilbert" ), "Maniac Mansion" },
+            { new Child("Roberta", "Williams"), "Sierra Entertainment" },
+            { new Child("Shigeru", "Miyamoto"), "The Legend of Zelda" },
+            { new Child("Sid"    , "Meier"   ), "Civilization" },
+            { new Child("Will"   , "Wright"  ), "Sim City 2000" },
+        };
 
         private static void IntroduceMethod(string methodName)
         {
